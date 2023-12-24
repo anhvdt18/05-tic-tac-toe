@@ -1,20 +1,17 @@
 import React from "react";
 
-function History(movedStep, moveToStep) {
+function History({ stepHistory, moveToStep }) {
   return (
     <div className="history">
       <h4>History</h4>
       <ul>
-        {moveToStep.map((movedStep, step) => {
-          const desc = movedStep
-            ? "Go to move #" + movedStep
-            : "Go to game start";
-          return (
-            <li key={movedStep}>
-              <button onClick={() => moveToStep(movedStep)}>{desc}</button>
-            </li>
-          );
-        })}
+        {stepHistory.map((step) => (
+          <li key={step}>
+            <button onClick={() => moveToStep(step)}>
+              {step ? "Go to move #" + step : "Go to game start"}
+            </button>
+          </li>
+        ))}
       </ul>
     </div>
   );

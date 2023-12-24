@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Board from "./Board";
-// import History from "./History";
+import History from "./History";
 
 function Game() {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState(null);
   const [history, setHistory] = useState([squares]);
-  const [step, setStep] = useState(["0"]);
+  const [step, setStep] = useState([0]);
   // console.log(step);
   //Declaring a Winner
   useEffect(() => {
@@ -57,12 +57,17 @@ function Game() {
     setHistory(newHistory);
     setSquares(newSquares);
     setXIsNext(!xIsNext);
-    setStep(step + 1);
-    // console.log(step);
+    setStep(step.concat([step.length]));
   };
   //Move to step?
   const moveToStep = (a) => {
-    setStep(a);
+    // console.log(a);
+    const squaresHistory = history.slice(0, a + 1);
+    const stepHistory = step.slice(0, a + 1);
+    setSquares(squaresHistory[a]);
+    setHistory(squaresHistory);
+    setStep(stepHistory);
+    setXIsNext(a % 2 ? false : true);
   };
 
   //Restart game
@@ -78,23 +83,7 @@ function Game() {
         <span className="player">Next player is: {xIsNext ? "X" : "O"}</span>
         <Board squares={squares} handleClick={handleClick} />
       </div>
-      <div className="history">
-        <h4>History</h4>
-        <ul>
-          {/* <li key={step}>
-            <button onClick={() => moveToStep()}>
-              {step ? "Go to move #" + step : "Go to game start"}
-            </button>
-          </li> */}
-          {step.map((step) => (
-            <li key={step}>
-              <button onClick={() => moveToStep()}>
-                {step ? "Go to move #" + step : "Go to game start"}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>{" "}
+      <History stepHistory={step} moveToStep={moveToStep} />
       <button onClick={handlRestart} className="restart-btn">
         Restart
       </button>
