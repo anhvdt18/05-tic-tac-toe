@@ -73,6 +73,7 @@ function Game() {
   //Restart game
   const handlRestart = () => {
     setSquares(Array(9).fill(null));
+    setStep([0]);
     setXIsNext(true);
   };
 
