@@ -29,8 +29,8 @@ body {
 
 .game {
   display: flex;
-  /* flex-direction: column; */
-  /* align-items: center; */
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
@@ -73,10 +73,6 @@ body {
   outline: none;
 }
 
-.board {
-  margin: 10px;
-}
-
 .board-row:after {
   clear: both;
   content: "";
@@ -87,7 +83,6 @@ body {
   border: 1px solid #20b7f6;
   border-radius: 5px;
   padding: 10px;
-  margin: 10px;
 }
 
 .history h4 {
@@ -101,8 +96,6 @@ body {
   margin: 0;
   font-size: 14px;
   text-align: center;
-  display: flex;
-  flex-direction: column;
 }
 
 .history button {
@@ -116,8 +109,4 @@ body {
   cursor: pointer;
   border: 1px solid #3787ce;
   border-radius: 4px;
-  width: 80px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
 }

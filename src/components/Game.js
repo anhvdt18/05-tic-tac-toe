@@ -1,206 +1,104 @@
 import React, { useState, useEffect } from "react";
+import Board from "./Board";
+// import History from "./History";
 
 function Game() {
-  //
-  const [moves, setMoves] = useState([
-    { id: "count-1", content: "Move to game #1" },
-    { id: "count-2", content: "Move to game #2" },
-  ]);
-  //
-  const [winner, setWinner] = useState("Who is Winner?");
-  //
-  const [count, setCount] = useState(0);
-  const moveCount = () => setCount(count + 1);
-  //
-  const [player, setPlayer] = useState("X");
-  const nextPlayer = () => {
-    moveCount();
-    if (player === "X") {
-      return setPlayer("O");
-    }
-    if (player === "O") {
-      return setPlayer("X");
-    }
-  };
-  //
-  const toPlay = (id) => {
-    if (winner !== "Who is Winner?") {
-      return;
-    } else {
-      const a = document.getElementById(id);
-      if (!a.innerHTML) {
-        a.innerHTML = player;
-        nextPlayer();
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [xIsNext, setXIsNext] = useState(true);
+  const [winner, setWinner] = useState(null);
+  const [history, setHistory] = useState([squares]);
+  const [step, setStep] = useState(["0"]);
+  // console.log(step);
+  //Declaring a Winner
+  useEffect(() => {
+    const newWinner = calculateWinner(squares);
+    setWinner(newWinner);
+  }, [squares]);
+
+  //function to check if a player has won.
+  //If a player has won, we can display text such as “Winner: X” or “Winner: O”.
+  //Input: squares: given an array of 9 squares:'X', 'O', or null.
+  const calculateWinner = (squares) => {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (
+        squares[a] &&
+        squares[a] === squares[b] &&
+        squares[a] === squares[c]
+      ) {
+        return squares[a];
       }
     }
+    return null;
   };
-  //
-  useEffect(() => {
-    const btn1 = document.getElementById("1").innerHTML;
-    const btn2 = document.getElementById("2").innerHTML;
-    const btn3 = document.getElementById("3").innerHTML;
-    const btn4 = document.getElementById("4").innerHTML;
-    const btn5 = document.getElementById("5").innerHTML;
-    const btn6 = document.getElementById("6").innerHTML;
-    const btn7 = document.getElementById("7").innerHTML;
-    const btn8 = document.getElementById("8").innerHTML;
-    const btn9 = document.getElementById("9").innerHTML;
-    //
-    window.localStorage.setItem(
-      `count-${count}`,
-      JSON.stringify([btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9])
-    );
-    //
-    if (
-      (btn1 === "X" && btn2 === "X" && btn3 === "X") ||
-      (btn4 === "X" && btn5 === "X" && btn6 === "X") ||
-      (btn7 === "X" && btn8 === "X" && btn9 === "X") ||
-      (btn1 === "X" && btn4 === "X" && btn7 === "X") ||
-      (btn2 === "X" && btn5 === "X" && btn8 === "X") ||
-      (btn3 === "X" && btn6 === "X" && btn9 === "X") ||
-      (btn1 === "X" && btn5 === "X" && btn9 === "X") ||
-      (btn3 === "X" && btn5 === "X" && btn7 === "X")
-    ) {
-      return setWinner("X");
-    } else if (
-      (btn1 === "O" && btn2 === "O" && btn3 === "O") ||
-      (btn4 === "O" && btn5 === "O" && btn6 === "O") ||
-      (btn7 === "O" && btn8 === "O" && btn9 === "O") ||
-      (btn1 === "O" && btn4 === "O" && btn7 === "O") ||
-      (btn2 === "O" && btn5 === "O" && btn8 === "O") ||
-      (btn3 === "O" && btn6 === "O" && btn9 === "O") ||
-      (btn1 === "O" && btn5 === "O" && btn9 === "O") ||
-      (btn3 === "O" && btn5 === "O" && btn7 === "O")
-    ) {
-      return setWinner("O");
-    } else if (count === 9) {
-      return setWinner("PEACE");
+
+  //Handle player
+  const handleClick = (i) => {
+    const newSquares = squares.slice();
+    const currentHistory = history.slice();
+
+    if (calculateWinner(newSquares) || newSquares[i]) {
+      return;
     }
-  }, [player]);
 
-  const restart = () => {
-    document.getElementById("1").innerHTML = "";
-    document.getElementById("2").innerHTML = "";
-    document.getElementById("3").innerHTML = "";
-    document.getElementById("4").innerHTML = "";
-    document.getElementById("5").innerHTML = "";
-    document.getElementById("6").innerHTML = "";
-    document.getElementById("7").innerHTML = "";
-    document.getElementById("8").innerHTML = "";
-    document.getElementById("9").innerHTML = "";
-    setCount(0);
-    setPlayer("X");
-    setWinner("Who is Winner?");
+    newSquares[i] = xIsNext ? "X" : "O";
+
+    const newHistory = currentHistory.concat([newSquares]);
+    setHistory(newHistory);
+    setSquares(newSquares);
+    setXIsNext(!xIsNext);
+    setStep(step + 1);
+    // console.log(step);
+  };
+  //Move to step?
+  const moveToStep = (a) => {
+    setStep(a);
   };
 
-  const goBack = (id) => {
-    const save = window.localStorage.getItem(id);
-    console.log(save);
+  //Restart game
+  const handlRestart = () => {
+    setSquares(Array(9).fill(null));
+    setXIsNext(true);
   };
 
-  //
   return (
-    <>
-      <div className="main">
-        <h2 className="result">
-          {winner !== "Who is Winner?" && winner !== "PEACE"
-            ? `Winner Is ${winner}`
-            : `${winner}`}
-        </h2>
-        <div className="game">
-          <div className="board">
-            <span className="player">Next player is {player}</span>
-            <div className="board-row">
-              <button
-                id="1"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-              <button
-                id="2"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-              <button
-                id="3"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-            </div>
-            <div className="board-row">
-              <button
-                id="4"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-              <button
-                id="5"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-              <button
-                id="6"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-            </div>
-            <div className="board-row">
-              <button
-                id="7"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-              <button
-                id="8"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-              <button
-                id="9"
-                className="square"
-                onClick={(e) => {
-                  toPlay(e.target.id);
-                }}
-              ></button>
-            </div>
-          </div>
-          <div className="history">
-            <h4>History</h4>
-            <ul>
-              <button onClick={restart}>Go to game start</button>
-              <button onClick={goBack}>Move to step #1</button>
-              <button onClick={goBack}>Move to step #2</button>
-              <button onClick={goBack}>Move to step #3</button>
-              <button onClick={goBack}>Move to step #4</button>
-              <button onClick={goBack}>Move to step #5</button>
-              <button onClick={goBack}>Move to step #6</button>
-              <button onClick={goBack}>Move to step #7</button>
-              <button onClick={goBack}>Move to step #8</button>
-              <button onClick={goBack}>Move to step #9</button>
-            </ul>
-          </div>
-        </div>
-        <div className="restart-btn" onClick={restart}>
-          Restart
-        </div>
+    <div className="main">
+      <h2 className="result">Winner is: {winner ? winner : "N/N"}</h2>
+      <div className="game">
+        <span className="player">Next player is: {xIsNext ? "X" : "O"}</span>
+        <Board squares={squares} handleClick={handleClick} />
       </div>
-    </>
+      <div className="history">
+        <h4>History</h4>
+        <ul>
+          {/* <li key={step}>
+            <button onClick={() => moveToStep()}>
+              {step ? "Go to move #" + step : "Go to game start"}
+            </button>
+          </li> */}
+          {step.map((step) => (
+            <li key={step}>
+              <button onClick={() => moveToStep()}>
+                {step ? "Go to move #" + step : "Go to game start"}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>{" "}
+      <button onClick={handlRestart} className="restart-btn">
+        Restart
+      </button>
+    </div>
   );
 }
 
